@@ -108,3 +108,87 @@ or
 ~~~
 kubectl describe pod nginx-pod
 ~~~
+
+### **ACCESSING THE APP FROM THE BROWSER** ###
+The ultimate goal of any solution is to access it either through a web portal or some application (e.g., mobile app). We have a Pod with Nginx container, so we need to access it from the browser. But all you have is a running Pod that has its own IP address which cannot be accessed through the browser. To achieve this, we need another Kubernetes object called Service to accept our request and pass it on to the Pod.
+
+A service is an object that accepts requests on behalf of the Pods and forwards it to the Pod’s IP address. If you run the command below, you will be able to see the Pod’s IP address. But there is no way to reach it directly from the outside world.
+
+~~~
+kubectl get pod nginx-pod  -o wide 
+~~~
+**Ouput**
+~~~
+~~~
+
+Let us try to access the Pod through its IP address from within the K8s cluster. To do this,
+
+1. We need an image that already has curl software installed.
+~~~
+dareyregistry/curl
+~~~
+
+2. Run kubectl to connect inside the container
+~~~
+kubectl run curl --image=dareyregistry/curl -i --tty
+~~~
+
+3. Run curl and point to the IP address of the Nginx Pod (Use the IP address of your own Pod)
+~~~
+curl -v 172.50.202.214:80
+~~~
+
+**Output**
+~~~
+~~~
+
+If the use case for your solution is required for internal use ONLY, without public Internet requirement. Then, this should be OK. But in most cases, it is NOT!
+
+Assuming that your requirement is to access the Nginx Pod internally, using the Pod’s IP address directly as above is not a reliable choice because Pods are ephemeral. They are not designed to run forever. When they die and another Pod is brought back up, the IP address will change and any application that is using the previous IP address directly will break.
+
+To solve this problem, kubernetes uses Service – An object that abstracts the underlining IP addresses of Pods. A service can serve as a load balancer, and a reverse proxy which basically takes the request using a human readable DNS name, resolves to a Pod IP that is running and forwards the request to it. This way, you do not need to use an IP address. Rather, you can simply refer to the service name directly.
+
+Let us create a service to access the Nginx Pod:
+
+1. Create a Service yaml manifest file:
+~~~
+sudo cat <<EOF | sudo tee ./nginx-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx-pod 
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+EOF
+~~~
+
+2. Create a nginx-service resource by applying your manifest
+~~~
+kubectl apply -f nginx-service.yaml
+~~~
+**Output**
+~~~
+~~~
+
+3. Check the created service
+~~~
+kubectl get service
+~~~
+
+output:
+~~~
+~~~
+
+**Observation:**
+
+The **TYPE** column in the output shows that there are different service types.
+
+- ClusterIP
+- NodePort
+- LoadBalancer &
+- Headless Service
