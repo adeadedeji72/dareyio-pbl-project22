@@ -238,3 +238,6 @@ kubectl  port-forward svc/nginx-service 8089:80
 ~~~
 
 **output:**
+~~~
+~~~
+Then go to your web browser and enter localhost:8089 – You should now be able to see the nginx page in the browser.
