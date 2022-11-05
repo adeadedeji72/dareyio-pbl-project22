@@ -474,3 +474,49 @@ Apply the manifest:
 kubectl apply -f deployment.yaml
 ~~~
         
+
+1. Get the Deployment
+~~~
+kubectl get deployment -o wide
+~~~
+**Output:*
+~~~
+~~~
+2. Get the ReplicaSet
+~~~
+kubectl get replicaset -o wide
+~~~
+**Output:*
+~~~
+~~~
+3. Get the Pods
+~~~
+kubectl get pods
+~~~
+**Output:*
+~~~
+~~~
+4. Scale the replicas in the Deployment to 15 Pods
+~~~
+kubectl scale rs nginx-rs --replicas=15 deployment/nginx-deployment scaled
+~~~
+5. Exec into one of the Pod’s container to run Linux commands
+~~~
+kubectl exec -it nginx-deployment-XXXXX bash
+~~~
+List the files and folders in the Nginx directory
+~~~
+ls -ltr /etc/nginx/
+~~~
+**Output:**
+~~~
+~~~
+Check the content of the default Nginx configuration file
+~~~
+cat  /etc/nginx/conf.d/default.conf
+~~~
+**Output:**
+~~~
+~~~
+
+![](k8s_workloads.png)
