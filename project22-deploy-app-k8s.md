@@ -192,3 +192,49 @@ The **TYPE** column in the output shows that there are different service types.
 - NodePort
 - LoadBalancer &
 - Headless Service
+
+**ClusterIP** is the default service type when no *type* is specified in the manifest file
+
+Now that we have a service created, how can we access the app? Since there is no public IP address, we can leverage kubectl's port-forward functionality.
+~~~
+kubectl  port-forward svc/nginx-service 8089:80
+~~~
+8089 is an arbitrary port number on your laptop or client PC, and we want to tunnel traffic through it to the port number of the nginx-service 80.
+
+![](port_fwd.png)
+
+Unfortunately, this will not work quite yet. Because there is no way the service will be able to select the actual Pod it is meant to route traffic to. If there are hundreds of Pods running, there must be a way to ensure that the service only forwards requests to the specific Pod it is intended for.
+
+To make this work, you must reconfigure the Pod manifest and introduce labels to match the selectors key in the field section of the service manifest.
+
+1. Update the Pod manifest with the below and apply the manifest:
+~~~
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  labels:
+    app: nginx-pod  
+spec:
+  containers:
+  - image: nginx:latest
+    name: nginx-pod
+    ports:
+    - containerPort: 80
+      protocol: TCP
+~~~
+
+under the metadata section, we have now introduced labels with a key field called app and its value nginx-pod. This matches exactly the selector key in the service manifest.
+
+The key/value pairs can be anything you specify. These are not Kubernetes specific keywords. As long as it matches the selector, the service object will be able to route traffic to the Pod.
+
+Apply the manifest with:
+~~~
+kubectl apply -f nginx-pod.yaml
+~~~
+2. Run kubectl port-forward command again
+~~~
+kubectl  port-forward svc/nginx-service 8089:80
+~~~
+
+**output:**
