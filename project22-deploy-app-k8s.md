@@ -74,3 +74,37 @@ Lets see what it looks like to have a Pod running in a k8s cluster. This section
 The **spec** section has further information about the Pod. Where to find the image to run the container – (This defaults to Docker Hub), the port and protocol.
 
 1. Create a **Pod** yaml manifest on your master node
+~~~
+sudo cat <<EOF | sudo tee ./nginx-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+name: nginx-pod
+spec:
+containers:
+- image: nginx:latest
+name: nginx-pod
+ports:
+- containerPort: 80
+  protocol: TCP
+EOF
+~~~
+
+2. Apply the manifest with the help of kubectl
+~~~
+kubectl apply -f nginx-pod.yaml
+~~~
+
+3. Get an output of the pods running in the cluster
+~~~
+kubectl get pods
+~~~
+
+4. To see other fields introduced by kubernetes after you have deployed the resource, simply run below command, and examine the output. You will see other fields that kubernetes updates from time to time to represent the state of the resource within the cluster. -o simply means the output format.
+~~~
+kubectl get pod nginx-pod -o yaml
+~~~
+or
+~~~
+kubectl describe pod nginx-pod
+~~~
