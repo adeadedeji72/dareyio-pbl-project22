@@ -241,3 +241,46 @@ kubectl  port-forward svc/nginx-service 8089:80
 ~~~
 ~~~
 Then go to your web browser and enter localhost:8089 – You should now be able to see the nginx page in the browser.
+
+upload output here!
+
+### **CREATE A REPLICA SET** ###
+Let us create a rs.yaml manifest for a ReplicaSet object:
+~~~
+#Part 1
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: nginx-rs
+spec:
+  replicas: 3
+  selector:
+    app: nginx-pod
+#Part 2
+  template:
+    metadata:
+      name: nginx-pod
+      labels:
+         app: nginx-pod
+    spec:
+      containers:
+      - image: nginx:latest
+        name: nginx-pod
+        ports:
+        - containerPort: 80
+          protocol: TCP
+~~~
+Apply the manifest file with:
+~~~
+kubectl apply -f rs.yaml
+~~~
+
+The manifest file of ReplicaSet consist of the following fields:
+
+- **apiVersion:** This field specifies the version of kubernetes Api to which the object belongs. ReplicaSet belongs to apps/v1 apiVersion.
+- **kind:** This field specify the type of object for which the manifest belongs to. Here, it is ReplicaSet.
+- **metadata:** This field includes the metadata for the object. It mainly includes two fields: name and labels of the ReplicaSet.
+- **spec:** This field specifies the label selector to be used to select the Pods, number of replicas of the Pod to be run and the container or list of containers which the Pod will run. In the above example, we are running 3 replicas of nginx container.
+Let us check what Pods have been created:
+
+kubectl get pods
