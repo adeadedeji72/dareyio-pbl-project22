@@ -292,5 +292,185 @@ Here we see three ngix-pods with some random suffixes (e.g., -j784r) – it mean
 
 Try to delete one of the Pods:
 
-kubectl delete po nginx-pod-j784r
+kubectl delete po nginx-pod-XXXx
+
 Output:
+~~~
+~~~
+~~~
+kubectl get pods
+~~~
+**Output:**
+~~~
+~~~
+
+Notice, that ReplicaSet understands which Pods to create by using SELECTOR key-value pair.
+
+Get detailed information of a ReplicaSet
+To display detailed information about any Kubernetes object, you can use 2 differen commands:
+
+- kubectl describe %object_type% %object_name% (e.g. kubectl describe rs nginx-rs)
+- kubectl get %object_type% %object_name% -o yaml (e.g. kubectl describe rs nginx-rs -o yaml)
+Try both commands in action and see the difference. Also try get with -o json instead of -o yaml and decide for yourself which output option is more readable for you.
+
+**Scale ReplicaSet up and down:**
+In general, there are 2 approaches of Kubernetes Object Management: imperative and declarative.
+
+Let us see how we can use both to scale our Replicaset up and down:
+
+**Imperative:**
+
+We can easily scale our ReplicaSet up by specifying the desired number of replicas in an imperative command, like this:
+~~~
+kubectl scale rs nginx-rs --replicas=5 replicationcontroller/nginx-rc scaled
+~~~
+
+Check the pods:
+~~~
+kubectl get pods
+~~~
+
+**Declarative:**
+
+Declarative way would be to open our rs.yaml manifest, change desired number of replicas in respective section
+~~~
+spec:
+  replicas: 3
+~~~
+and applying the updated manifest:
+~~~
+kubectl apply -f rs.yaml
+~~~
+There is another method – **‘ad-hoc’**, it is definitely not the best practice and we do not recommend using it, but you can edit an existing ReplicaSet with following command:
+~~~
+kubectl edit -f rs.yaml
+~~~
+
+**Advanced label matching**
+As Kubernetes mature as a technology, so does its features and improvements to k8s objects. ReplicationControllers do not meet certain complex business requirements when it comes to using selectors. Imagine if you need to select Pods with multiple lables that represents things like:
+
+Application tier: such as Frontend, or Backend
+Environment: such as Dev, SIT, QA, Preprod, or Prod
+So far, we used a simple selector that just matches a key-value pair and check only ‘equality’:
+~~~
+  selector:
+    app: nginx-pod
+~~~
+But in some cases, we want ReplicaSet to manage our existing containers that match certain criteria, we can use the same simple label matching or we can use some more complex conditions, such as:
+
+ - in
+ - not in
+ - not equal
+ - etc...
+Let us look at the following manifest file:
+~~~
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata: 
+  name: nginx-rs
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      env: prod
+    matchExpressions:
+    - { key: tier, operator: In, values: [frontend] }
+  template:
+    metadata:
+      name: nginx
+      labels: 
+        env: prod
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+          protocol: TCP
+~~~
+In the above spec file, under the selector, **matchLabels** and **matchExpression** are used to specify the key-value pair. The matchLabel works exactly the same way as the equality-based selector, and the matchExpression is used to specify the set based selectors. This feature is the main differentiator between ReplicaSet and previously mentioned obsolete ReplicationController.
+
+Get the replication set:
+~~~
+kubectl get rs nginx-rs -o wide
+~~~
+
+**Output:*
+~~~
+~~~
+
+
+### **USING AWS LOAD BALANCER TO ACCESS YOUR SERVICE IN KUBERNETES.** ###
+### **USING DEPLOYMENT CONTROLLERS** ###
+
+A Deployment is another layer above ReplicaSets and Pods, newer and more advanced level concept than ReplicaSets. It manages the deployment of ReplicaSets and allows for easy updating of a ReplicaSet as well as the ability to roll back to a previous version of deployment. It is declarative and can be used for rolling updates of micro-services, ensuring there is no downtime.
+
+Officially, it is highly recommended to use Deplyments to manage replica sets rather than using replica sets directly.
+
+Let us see Deployment in action.
+
+1. Delete the ReplicaSet
+~~~
+kubectl delete rs nginx-rs
+~~~
+2. Understand the layout of the deployment.yaml manifest below. Lets go through the 3 separated sections:
+~~~
+# Section 1 - This is the part that defines the deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    tier: frontend
+
+# Section 2 - This is the Replica set layer controlled by the deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: frontend
+
+# Section 3 - This is the Pod section controlled by the deployment and selected by the replica set in section 2.
+  template:
+    metadata:
+      labels:
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+~~~
+
+3. Putting them altogether
+~~~
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    tier: frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+~~~
+
+Apply the manifest:
+~~~
+kubectl apply -f deployment.yaml
+~~~
+        
