@@ -281,6 +281,16 @@ The manifest file of ReplicaSet consist of the following fields:
 - **kind:** This field specify the type of object for which the manifest belongs to. Here, it is ReplicaSet.
 - **metadata:** This field includes the metadata for the object. It mainly includes two fields: name and labels of the ReplicaSet.
 - **spec:** This field specifies the label selector to be used to select the Pods, number of replicas of the Pod to be run and the container or list of containers which the Pod will run. In the above example, we are running 3 replicas of nginx container.
-Let us check what Pods have been created:
 
+Let us check what Pods have been created:
+~~~
 kubectl get pods
+~~~
+**Output:**
+
+Here we see three ngix-pods with some random suffixes (e.g., -j784r) – it means, that these Pods were created and named automatically by some other object (higher level of abstraction) such as ReplicaSet.
+
+Try to delete one of the Pods:
+
+kubectl delete po nginx-pod-j784r
+Output:
