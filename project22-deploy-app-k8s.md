@@ -525,15 +525,165 @@ nginx-rs-rp7lc   1/1     Running   0             8m4s
 nginx-rs-wdsqq   1/1     Running   0             8m4s
 ~~~
 
+Explore the ReplicaSet created:
+~~~
+kubectl get rs -o wide
+~~~
 
-
+**Output:**
+~~~
+NAME       DESIRED   CURRENT   READY   AGE   CONTAINERS   IMAGES         SELECTOR
+nginx-rs   3         3         3       14m   nginx-pod    nginx:latest   app=nginx-pod
+~~~
 Notice, that ReplicaSet understands which Pods to create by using SELECTOR key-value pair.
 
-Get detailed information of a ReplicaSet
+**Get detailed information of a ReplicaSet**
 To display detailed information about any Kubernetes object, you can use 2 differen commands:
 
-- kubectl describe %object_type% %object_name% (e.g. kubectl describe rs nginx-rs)
-- kubectl get %object_type% %object_name% -o yaml (e.g. kubectl describe rs nginx-rs -o yaml)
+- kubectl **describe** %object_type% %object_name% (e.g. kubectl describe rs nginx-rs)
+**Output:**
+~~~
+Name:         nginx-rs
+Namespace:    default
+Selector:     app=nginx-pod
+Labels:       <none>
+Annotations:  <none>
+Replicas:     3 current / 3 desired
+Pods Status:  3 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=nginx-pod
+  Containers:
+   nginx-pod:
+    Image:        nginx:latest
+    Port:         80/TCP
+    Host Port:    0/TCP
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Events:
+  Type    Reason            Age    From                   Message
+  ----    ------            ----   ----                   -------
+  Normal  SuccessfulCreate  16m    replicaset-controller  Created pod: nginx-rs-wdsqq
+  Normal  SuccessfulCreate  16m    replicaset-controller  Created pod: nginx-rs-rp7lc
+  Normal  SuccessfulCreate  8m26s  replicaset-controller  Created pod: nginx-rs-7n94g
+  ~~~
+- kubectl **get** %object_type% %object_name% -o yaml (e.g. kubectl describe rs nginx-rs -o yaml)
+**Output**
+~~~
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"ReplicaSet","metadata":{"annotations":{},"name":"nginx-rs","namespace":"default"},"spec":{"replicas":3,"selector":{"matchLabels":{"app":"nginx-pod"}},"template":{"metadata":{"labels":{"app":"nginx-pod"},"name":"nginx-pod"},"spec":{"containers":[{"image":"nginx:latest","name":"nginx-pod","ports":[{"containerPort":80,"protocol":"TCP"}]}]}}}}
+  creationTimestamp: "2022-11-07T11:43:31Z"
+  generation: 1
+  name: nginx-rs
+  namespace: default
+  resourceVersion: "12246"
+  uid: f2af3264-e15c-413e-ab40-702952726435
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx-pod
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: nginx-pod
+      name: nginx-pod
+    spec:
+      containers:
+      - image: nginx:latest
+        imagePullPolicy: Always
+        name: nginx-pod
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 3
+  fullyLabeledReplicas: 3
+  observedGeneration: 1
+  readyReplicas: 3
+  replicas: 3
+~~~
+~~~
+kubectl get rs nginx-rs -o json
+~~~
+**Output:**
+~~~
+{
+    "apiVersion": "apps/v1",
+    "kind": "ReplicaSet",
+    "metadata": {
+        "annotations": {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apps/v1\",\"kind\":\"ReplicaSet\",\"metadata\":{\"annotations\":{},\"name\":\"nginx-rs\",\"namespace\":\"default\"},\"spec\":{\"replicas\":3,\"selector\":{\"matchLabels\":{\"app\":\"nginx-pod\"}},\"template\":{\"metadata\":{\"labels\":{\"app\":\"nginx-pod\"},\"name\":\"nginx-pod\"},\"spec\":{\"containers\":[{\"image\":\"nginx:latest\",\"name\":\"nginx-pod\",\"ports\":[{\"containerPort\":80,\"protocol\":\"TCP\"}]}]}}}}\n"
+        },
+        "creationTimestamp": "2022-11-07T11:43:31Z",
+        "generation": 1,
+        "name": "nginx-rs",
+        "namespace": "default",
+        "resourceVersion": "12246",
+        "uid": "f2af3264-e15c-413e-ab40-702952726435"
+    },
+    "spec": {
+        "replicas": 3,
+        "selector": {
+            "matchLabels": {
+                "app": "nginx-pod"
+            }
+        },
+        "template": {
+            "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "nginx-pod"
+                },
+                "name": "nginx-pod"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "image": "nginx:latest",
+                        "imagePullPolicy": "Always",
+                        "name": "nginx-pod",
+                        "ports": [
+                            {
+                                "containerPort": 80,
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "resources": {},
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30
+            }
+        }
+    },
+    "status": {
+        "availableReplicas": 3,
+        "fullyLabeledReplicas": 3,
+        "observedGeneration": 1,
+        "readyReplicas": 3,
+        "replicas": 3
+    }
+}
+~~~
 Try both commands in action and see the difference. Also try get with -o json instead of -o yaml and decide for yourself which output option is more readable for you.
 
 **Scale ReplicaSet up and down:**
