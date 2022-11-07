@@ -499,7 +499,7 @@ kubectl get pods
 ~~~
 **Output:**
 
-Here we see three ngix-pods with some random suffixes (e.g., -j784r) – it means, that these Pods were created and named automatically by some other object (higher level of abstraction) such as ReplicaSet.
+Here we see three ngix-pods with some random suffixes (e.g., -rp7lc) – it means, that these Pods were created and named automatically by some other object (higher level of abstraction) such as ReplicaSet.
 
 Try to delete one of the Pods:
 
@@ -513,6 +513,10 @@ kubectl get pods
 ~~~
 **Output:**
 ~~~
+NAME             READY   STATUS    RESTARTS      AGE
+nginx-pod        1/1     Running   0             57m
+nginx-rs-rp7lc   1/1     Running   0             3m8s
+nginx-rs-wdsqq   1/1     Running   0             3m8s
 ~~~
 
 Notice, that ReplicaSet understands which Pods to create by using SELECTOR key-value pair.
