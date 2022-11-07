@@ -96,16 +96,180 @@ kubectl apply -f nginx-pod.yaml
 ~~~
 kubectl get pods
 ~~~
+**Output:**
+~~~
+NAME        READY   STATUS    RESTARTS   AGE
+nginx-pod   1/1     Running   0          102s
+~~~
 
 4. To see other fields introduced by kubernetes after you have deployed the resource, simply run below command, and examine the output. You will see other fields that kubernetes updates from time to time to represent the state of the resource within the cluster. -o simply means the output format.
 ~~~
 kubectl get pod nginx-pod -o yaml
 ~~~
+**Output:**
+~~~
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Pod","metadata":{"annotations":{},"name":"nginx-pod","namespace":"default"},"spec":{"containers":[{"image":"nginx:latest","name":"nginx-pod","ports":[{"containerPort":80,"protocol":"TCP"}]}]}}
+    kubernetes.io/psp: eks.privileged
+  creationTimestamp: "2022-11-07T10:48:40Z"
+  name: nginx-pod
+  namespace: default
+  resourceVersion: "3921"
+  uid: 5e664a09-d7eb-42fc-a978-accb5184be3e
+spec:
+  containers:
+  - image: nginx:latest
+    imagePullPolicy: Always
+    name: nginx-pod
+    ports:
+    - containerPort: 80
+      protocol: TCP
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-hg9n4
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: ip-10-0-1-138.ec2.internal
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: kube-api-access-hg9n4
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2022-11-07T10:48:40Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2022-11-07T10:48:46Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2022-11-07T10:48:46Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2022-11-07T10:48:40Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: docker://11c9ba6930b63f908809cdd6195c325a51095280e0c34fd874089b1605fd1e2c
+    image: nginx:latest
+    imageID: docker-pullable://nginx@sha256:943c25b4b66b332184d5ba6bb18234273551593016c0e0ae906bab111548239f
+    lastState: {}
+    name: nginx-pod
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2022-11-07T10:48:45Z"
+  hostIP: 10.0.1.138
+  phase: Running
+  podIP: 10.0.1.228
+  podIPs:
+  - ip: 10.0.1.228
+  qosClass: BestEffort
+  startTime: "2022-11-07T10:48:40Z"
+  ~~~
 or
 ~~~
 kubectl describe pod nginx-pod
 ~~~
-
+**Output:**
+~~~
+Name:             nginx-pod
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             ip-10-0-1-138.ec2.internal/10.0.1.138
+Start Time:       Mon, 07 Nov 2022 10:48:40 +0000
+Labels:           <none>
+Annotations:      kubernetes.io/psp: eks.privileged
+Status:           Running
+IP:               10.0.1.228
+IPs:
+  IP:  10.0.1.228
+Containers:
+  nginx-pod:
+    Container ID:   docker://11c9ba6930b63f908809cdd6195c325a51095280e0c34fd874089b1605fd1e2c
+    Image:          nginx:latest
+    Image ID:       docker-pullable://nginx@sha256:943c25b4b66b332184d5ba6bb18234273551593016c0e0ae906bab111548239f
+    Port:           80/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Mon, 07 Nov 2022 10:48:45 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-hg9n4 (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  kube-api-access-hg9n4:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age    From               Message
+  ----    ------     ----   ----               -------
+  Normal  Scheduled  4m41s  default-scheduler  Successfully assigned default/nginx-pod to ip-10-0-1-138.ec2.internal
+  Normal  Pulling    4m39s  kubelet            Pulling image "nginx:latest"
+  Normal  Pulled     4m36s  kubelet            Successfully pulled image "nginx:latest" in 3.051842698s
+  Normal  Created    4m36s  kubelet            Created container nginx-pod
+  Normal  Started    4m36s  kubelet            Started container nginx-pod
+  ~~~
 ### **ACCESSING THE APP FROM THE BROWSER** ###
 The ultimate goal of any solution is to access it either through a web portal or some application (e.g., mobile app). We have a Pod with Nginx container, so we need to access it from the browser. But all you have is a running Pod that has its own IP address which cannot be accessed through the browser. To achieve this, we need another Kubernetes object called Service to accept our request and pass it on to the Pod.
 
