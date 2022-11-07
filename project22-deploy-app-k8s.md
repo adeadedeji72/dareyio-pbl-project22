@@ -695,14 +695,22 @@ Let us see how we can use both to scale our Replicaset up and down:
 
 We can easily scale our ReplicaSet up by specifying the desired number of replicas in an imperative command, like this:
 ~~~
-kubectl scale rs nginx-rs --replicas=5 replicationcontroller/nginx-rc scaled
+kubectl scale --replicas=5 replicaset/nginx-rs
 ~~~
 
 Check the pods:
 ~~~
 kubectl get pods
 ~~~
-
+**Output:**
+~~~
+NAME             READY   STATUS    RESTARTS      AGE
+nginx-rs-7n94g   1/1     Running   0             24m
+nginx-rs-8n8mg   1/1     Running   0             2m23s
+nginx-rs-hmghv   1/1     Running   0             2m23s
+nginx-rs-rp7lc   1/1     Running   0             32m
+nginx-rs-wdsqq   1/1     Running   0             32m
+~~~
 **Declarative:**
 
 Declarative way would be to open our rs.yaml manifest, change desired number of replicas in respective section
