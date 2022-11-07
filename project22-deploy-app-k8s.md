@@ -430,7 +430,7 @@ spec:
       protocol: TCP
 ~~~
 
-under the metadata section, we have now introduced labels with a key field called app and its value nginx-pod. This matches exactly the selector key in the service manifest.
+under the metadata section, we have now introduced **labels** with a key field called **app** and its value nginx-pod. This matches exactly the selector key in the service manifest.
 
 The key/value pairs can be anything you specify. These are not Kubernetes specific keywords. As long as it matches the selector, the service object will be able to route traffic to the Pod.
 
@@ -445,10 +445,14 @@ kubectl  port-forward svc/nginx-service 8089:80
 
 **output:**
 ~~~
+Forwarding from 127.0.0.1:8089 -> 80
+Forwarding from [::1]:8089 -> 80
 ~~~
 Then go to your web browser and enter localhost:8089 – You should now be able to see the nginx page in the browser.
+If your workstation is a remote machine and you are using Visual Studio code, you may have to forward the port 8089 on the VSC too for the end-point to display on your pc.
 
-upload output here!
+![](port_forward.jpg)
+
 
 ### **CREATE A REPLICA SET** ###
 Let us create a rs.yaml manifest for a ReplicaSet object:
