@@ -280,6 +280,8 @@ kubectl get pod nginx-pod  -o wide
 ~~~
 **Ouput**
 ~~~
+NAME        READY   STATUS    RESTARTS   AGE     IP           NODE                         NOMINATED NODE   READINESS GATES
+nginx-pod   1/1     Running   0          5m46s   10.0.1.228   ip-10-0-1-138.ec2.internal   <none>           <none>
 ~~~
 
 Let us try to access the Pod through its IP address from within the K8s cluster. To do this,
@@ -296,11 +298,50 @@ kubectl run curl --image=dareyregistry/curl -i --tty
 
 3. Run curl and point to the IP address of the Nginx Pod (Use the IP address of your own Pod)
 ~~~
-curl -v 172.50.202.214:80
+curl -v 10.0.1.228:80
 ~~~
 
 **Output**
 ~~~
+/ # curl -v 10.0.1.228:80
+> GET / HTTP/1.1
+> User-Agent: curl/7.35.0
+> Host: 10.0.1.228
+> Accept: */*
+> 
+< HTTP/1.1 200 OK
+< Server: nginx/1.23.2
+< Date: Mon, 07 Nov 2022 10:59:26 GMT
+< Content-Type: text/html
+< Content-Length: 615
+< Last-Modified: Wed, 19 Oct 2022 07:56:21 GMT
+< Connection: keep-alive
+< ETag: "634fada5-267"
+< Accept-Ranges: bytes
+< 
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
 ~~~
 
 If the use case for your solution is required for internal use ONLY, without public Internet requirement. Then, this should be OK. But in most cases, it is NOT!
