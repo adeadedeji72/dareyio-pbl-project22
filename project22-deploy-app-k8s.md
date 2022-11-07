@@ -740,6 +740,7 @@ kubectl edit -f rs.yaml
 ~~~
 
 **Advanced label matching**
+
 As Kubernetes mature as a technology, so does its features and improvements to k8s objects. ReplicationControllers do not meet certain complex business requirements when it comes to using selectors. Imagine if you need to select Pods with multiple lables that represents things like:
 
 Application tier: such as Frontend, or Backend
@@ -782,7 +783,7 @@ spec:
         - containerPort: 80
           protocol: TCP
 ~~~
-In the above spec file, under the selector, **matchLabels** and **matchExpression** are used to specify the key-value pair. The matchLabel works exactly the same way as the equality-based selector, and the matchExpression is used to specify the set based selectors. This feature is the main differentiator between ReplicaSet and previously mentioned obsolete ReplicationController.
+In the above spec file, under the selector, **matchLabels** and **matchExpression** are used to specify the key-value pair. The matchLabel works exactly the same way as the equality-based selector, and the matchExpression is used to specify the set based selectors. This feature is the main differentiator between *ReplicaSet* and previously mentioned obsolete *ReplicationController*.
 
 Get the replication set:
 ~~~
@@ -791,6 +792,8 @@ kubectl get rs nginx-rs -o wide
 
 **Output:*
 ~~~
+NAME        DESIRED   CURRENT   READY   AGE   CONTAINERS        IMAGES         SELECTOR
+nginx1-rs   3         3         3       69s   nginx-container   nginx:latest   env=prod,tier in (frontend)
 ~~~
 
 
