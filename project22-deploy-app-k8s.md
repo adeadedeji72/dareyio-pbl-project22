@@ -997,3 +997,61 @@ server {
 ~~~
 
 ![](k8s_workloads.png)
+
+
+### PERSISTING DATA FOR PODS ###
+
+Deployments are stateless by design. Hence, any data stored inside the Pod’s container does not persist when the Pod dies.
+
+If you were to update the content of the index.html file inside the container, and the Pod dies, that content will not be lost since a new Pod will replace the dead one.
+
+Let us try that:
+
+1. Scale down the Pods to one (1) replica
+~~~
+kubectl scale --replicas=1 deployment nginx-deployment
+~~~
+Check with
+~~~
+kubectl get pods
+~~~
+Output:
+~~~
+NAME                                READY   STATUS    RESTARTS       AGE
+nginx-deployment-55c7d849bc-46rzs   1/1     Running   0              30m
+~~~
+2. Exec into the running container (figure out the command yourself)
+
+3. Install vim so that you can edit the file
+~~~
+apt-get update
+apt-get install vim
+~~~
+
+4. Update the content of the file and add the code below /usr/share/nginx/html/index.html
+~~~
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to DAREY.IO!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to ADEBAYO.IO!</h1>
+<p>I love experiencing Kubernetes</p>
+
+<p>Learning by doing is absolutely the best strategy at 
+<a href="https://darey.io/">www.darey.io</a>.<br/>
+for skills acquisition
+<a href="https://darey.io/">www.darey.io</a>.</p>
+
+<p><em>Thank you for learning from BAYO.IO</em></p>
+</body>
+</html>
+~~~
