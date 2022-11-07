@@ -1058,3 +1058,12 @@ for skills acquisition
 </body>
 </html>
 ~~~
+
+Check the output with:
+~~~
+kubectl  port-forward nginx-deployment-55c7d849bc-46rzs  8088:80
+~~~~
+**NOTE** 
+nginx-deployment-55c7d849bc-46rzs is the pod we exec into
+
+![](port_forwardbayo.jpg)
