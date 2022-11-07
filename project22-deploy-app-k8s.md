@@ -75,20 +75,17 @@ The **spec** section has further information about the Pod. Where to find the im
 
 1. Create a **Pod** yaml manifest on your master node
 ~~~
-sudo cat <<EOF | sudo tee ./nginx-pod.yaml
 apiVersion: v1
 kind: Pod
 metadata:
-name: nginx-pod
+  name: nginx-pod
 spec:
-containers:
-- image: nginx:latest
-name: nginx-pod
-ports:
-- containerPort: 80
-  protocol: TCP
-EOF
-~~~
+  containers:
+  - image: nginx:latest
+    name: nginx-pod
+    ports:
+    - containerPort: 80
+      protocol: TCP
 
 2. Apply the manifest with the help of kubectl
 ~~~
