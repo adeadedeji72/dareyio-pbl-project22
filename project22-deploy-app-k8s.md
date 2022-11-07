@@ -877,6 +877,8 @@ kubectl get deployment -o wide
 ~~~
 **Output:*
 ~~~
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES         SELECTOR
+nginx-deployment   3/3     3            3           91s   nginx        nginx:latest   tier=frontend
 ~~~
 2. Get the ReplicaSet
 ~~~
@@ -884,6 +886,8 @@ kubectl get replicaset -o wide
 ~~~
 **Output:*
 ~~~
+NAME                          DESIRED   CURRENT   READY   AGE     CONTAINERS   IMAGES         SELECTOR
+nginx-deployment-55c7d849bc   3         3         3       2m46s   nginx        nginx:latest   pod-template-hash=55c7d849bc,tier=frontend
 ~~~
 3. Get the Pods
 ~~~
@@ -891,14 +895,37 @@ kubectl get pods
 ~~~
 **Output:*
 ~~~
+NAME                                READY   STATUS    RESTARTS       AGE
+nginx-deployment-55c7d849bc-7hltl   1/1     Running   0              3m28s
+nginx-deployment-55c7d849bc-h2qb5   1/1     Running   0              3m28s
+nginx-deployment-55c7d849bc-v7rnh   1/1     Running   0              3m28s
 ~~~
 4. Scale the replicas in the Deployment to 15 Pods
 ~~~
-kubectl scale rs nginx-rs --replicas=15 deployment/nginx-deployment scaled
+kubectl scale --replicas=15 deployment/nginx-deployment
+~~~
+*kubectl get pods* command output:
+~~~
+NAME                                READY   STATUS    RESTARTS       AGE
+nginx-deployment-55c7d849bc-46rzs   1/1     Running   0              85s
+nginx-deployment-55c7d849bc-5dhf7   1/1     Running   0              85s
+nginx-deployment-55c7d849bc-5ffwv   1/1     Running   0              85s
+nginx-deployment-55c7d849bc-7hltl   1/1     Running   0              6m40s
+nginx-deployment-55c7d849bc-995j6   0/1     Pending   0              85s
+nginx-deployment-55c7d849bc-h2qb5   1/1     Running   0              6m40s
+nginx-deployment-55c7d849bc-ll4pv   0/1     Pending   0              85s
+nginx-deployment-55c7d849bc-pb294   1/1     Running   0              86s
+nginx-deployment-55c7d849bc-qg2sk   1/1     Running   0              85s
+nginx-deployment-55c7d849bc-qlfcd   1/1     Running   0              86s
+nginx-deployment-55c7d849bc-r6f98   1/1     Running   0              86s
+nginx-deployment-55c7d849bc-rz5lz   1/1     Running   0              85s
+nginx-deployment-55c7d849bc-v5pd6   0/1     Pending   0              85s
+nginx-deployment-55c7d849bc-v7rnh   1/1     Running   0              6m40s
+nginx-deployment-55c7d849bc-z257c   1/1     Running   0              85s
 ~~~
 5. Exec into one of the Pod’s container to run Linux commands
 ~~~
-kubectl exec -it nginx-deployment-XXXXX bash
+kubectl exec -it nginx-deployment-55c7d849bc-z257c bash
 ~~~
 List the files and folders in the Nginx directory
 ~~~
@@ -906,6 +933,15 @@ ls -ltr /etc/nginx/
 ~~~
 **Output:**
 ~~~
+root@nginx-deployment-55c7d849bc-z257c:/# ls -ltr /etc/nginx
+total 24
+-rw-r--r-- 1 root root  664 Oct 19 07:56 uwsgi_params
+-rw-r--r-- 1 root root  636 Oct 19 07:56 scgi_params
+-rw-r--r-- 1 root root 5349 Oct 19 07:56 mime.types
+-rw-r--r-- 1 root root 1007 Oct 19 07:56 fastcgi_params
+-rw-r--r-- 1 root root  648 Oct 19 09:32 nginx.conf
+lrwxrwxrwx 1 root root   22 Oct 19 09:32 modules -> /usr/lib/nginx/modules
+drwxr-xr-x 1 root root   26 Nov  7 13:05 conf.d
 ~~~
 Check the content of the default Nginx configuration file
 ~~~
@@ -913,6 +949,51 @@ cat  /etc/nginx/conf.d/default.conf
 ~~~
 **Output:**
 ~~~
+root@nginx-deployment-55c7d849bc-z257c:/# cat  /etc/nginx/conf.d/default.conf
+server {
+    listen       80;
+    listen  [::]:80;
+    server_name  localhost;
+
+    #access_log  /var/log/nginx/host.access.log  main;
+
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
+
+    #error_page  404              /404.html;
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+    #
+    #location ~ \.php$ {
+    #    proxy_pass   http://127.0.0.1;
+    #}
+
+    # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+    #
+    #location ~ \.php$ {
+    #    root           html;
+    #    fastcgi_pass   127.0.0.1:9000;
+    #    fastcgi_index  index.php;
+    #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+    #    include        fastcgi_params;
+    #}
+
+    # deny access to .htaccess files, if Apache's document root
+    # concurs with nginx's one
+    #
+    #location ~ /\.ht {
+    #    deny  all;
+    #}
+}
 ~~~
 
 ![](k8s_workloads.png)
