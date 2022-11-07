@@ -1059,7 +1059,7 @@ for skills acquisition
 </html>
 ~~~
 
-Check the output with:
+5. Check the output with:
 ~~~
 kubectl  port-forward nginx-deployment-55c7d849bc-46rzs  8088:80
 ~~~~
@@ -1067,3 +1067,21 @@ kubectl  port-forward nginx-deployment-55c7d849bc-46rzs  8088:80
 nginx-deployment-55c7d849bc-46rzs is the pod we exec into
 
 ![](port_forwardbayo.jpg)
+
+6. Now, delete the only running Pod
+~~~
+ kubectl delete pod nginx-deployment-55c7d849bc-46rzs 
+ pod "nginx-deployment-55c7d849bc-46rzs" deleted
+~~~
+
+7. Refresh the web page – You will see that the content you saved in the container is no longer there. That is because Pods do not store data when they are being recreated – that is why they are called ephemeral or stateless. (But not to worry, we will address this with persistent volumes in the next project)
+
+![](port_forwardnew.jpg)
+
+
+Storage is a critical part of running containers, and Kubernetes offers some powerful primitives for managing it. Dynamic volume provisioning, a feature unique to Kubernetes, which allows storage volumes to be created on-demand. Without dynamic provisioning, DevOps engineers must manually make calls to the cloud or storage provider to create new storage volumes, and then create PersistentVolume objects to represent them in Kubernetes. The dynamic provisioning feature eliminates the need for DevOps to pre-provision storage. Instead, it automatically provisions storage when it is requested by users.
+
+To make the data persist in case of a Pod’s failure, you will need to configure the Pod to use following objects:
+
+Persistent Volume or pv – is a piece of storage in the cluster that has been provisioned by an administrator or dynamically provisioned using Storage Classes.
+Persistent Volume Claim or pvc. Persistent Volume Claim is simply a request for storage, hence the "claim" in its name.
