@@ -86,7 +86,7 @@ spec:
     ports:
     - containerPort: 80
       protocol: TCP
-
+~~~
 2. Apply the manifest with the help of kubectl
 ~~~
 kubectl apply -f nginx-pod.yaml
