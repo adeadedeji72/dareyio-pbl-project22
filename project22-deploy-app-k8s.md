@@ -375,6 +375,7 @@ kubectl apply -f nginx-service.yaml
 ~~~
 **Output**
 ~~~
+service/nginx-service created
 ~~~
 
 3. Check the created service
@@ -384,6 +385,9 @@ kubectl get service
 
 output:
 ~~~
+NAME            TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
+kubernetes      ClusterIP   172.20.0.1       <none>        443/TCP   39m
+nginx-service   ClusterIP   172.20.101.152   <none>        80/TCP    16s
 ~~~
 
 **Observation:**
