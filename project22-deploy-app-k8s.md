@@ -465,7 +465,8 @@ metadata:
 spec:
   replicas: 3
   selector:
-    app: nginx-pod
+    matchLabels:
+      app: nginx-pod
 #Part 2
   template:
     metadata:
