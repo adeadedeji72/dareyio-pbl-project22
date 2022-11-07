@@ -1020,7 +1020,10 @@ Output:
 NAME                                READY   STATUS    RESTARTS       AGE
 nginx-deployment-55c7d849bc-46rzs   1/1     Running   0              30m
 ~~~
-2. Exec into the running container (figure out the command yourself)
+2. Exec into the running container
+~~~
+kubectl exec -it nginx-deployment-55c7d849bc-46rzs bash
+~~~
 
 3. Install vim so that you can edit the file
 ~~~
@@ -1033,7 +1036,7 @@ apt-get install vim
 <!DOCTYPE html>
 <html>
 <head>
-<title>Welcome to DAREY.IO!</title>
+<title>Welcome to ADEBAYO.IO!</title>
 <style>
     body {
         width: 35em;
